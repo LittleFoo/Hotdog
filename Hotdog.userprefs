@@ -1,0 +1,16 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Rec/script/logic/RigidEnemy.cs">
+    <Files>
+      <File FileName="Assets/Rec/script/logic/GameController.cs" Line="91" Column="42" />
+      <File FileName="Assets/Rec/script/logic/Map.cs" Line="357" Column="28" />
+      <File FileName="Assets/Rec/script/logic/UIController.cs" Line="36" Column="24" />
+      <File FileName="Assets/Rec/script/logic/UIGaming.cs" Line="65" Column="3" />
+      <File FileName="Assets/Rec/script/logic/RigidEnemy.cs" Line="27" Column="21" NotebookId="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
