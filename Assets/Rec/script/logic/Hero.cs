@@ -8,15 +8,23 @@ using DG.Tweening;
 public class Hero : MonoBehaviour, ITimerEvent {
 	[HideInInspector]
 	public Transform tf;
+	public SpriteRenderer headSprRdr;
+	public Transform headMask;
+	public Transform tailMask;
 	public SpriteAnimation ani;
 	public Sprite[] headSprs;
 	public Sprite[] headGetSprs;
 	public Sprite[] bodyMaskSprs;
 	public Sprite[] idleSpr;
+	public Sprite[] tailSprs; //straight, turn right , turn left;
+	public Sprite[] bodySprs;
+
+	private float _moveTime = 0.3f;
 	private SpawnPool _pool;
 	private PrefabPool pp;
 	private int _lastDir;
 	private int _nextDir;
+	private int _initDir;
 	private Coord _curPos;
 	private Tweener _curTween;
 	private List<Transform> _tailList;
@@ -30,9 +38,17 @@ public class Hero : MonoBehaviour, ITimerEvent {
 		set{ _life = value; }
 	}
 
+	private bool _isBackwards = false;
+	public bool isBackwards
+	{
+		get{ return _isBackwards;}
+	}
+
 	// Use this for initialization
 	void Awake () {
 		tf = transform;
+		headSprRdr = tf.GetComponent<SpriteRenderer>();
+
 		_pool = GlobalController.instance.getCurPool();
 		pp = new PrefabPool(GlobalController.instance.prefabSetting.tail);
 		_pool.CreatePrefabPool(pp);
@@ -49,49 +65,57 @@ public class Hero : MonoBehaviour, ITimerEvent {
 	{
 		if(Input.GetKeyDown(KeyCode.UpArrow))
 		{
+			if(_isBackwards)
+				return;
 			_nextDir = 0;
 			if(_curTween == null)
 				onMoveComplete();
 		}
 		else if(Input.GetKeyDown(KeyCode.DownArrow))
 		{
+			if(_isBackwards)
+				return;
 			_nextDir = 2;
 			if(_curTween == null)
 				onMoveComplete();
 		}
 		else if(Input.GetKeyDown(KeyCode.LeftArrow))
 		{
+			if(_isBackwards)
+				return;
 			_nextDir = 3;
 			if(_curTween == null)
 				onMoveComplete();
 		}
 		else if(Input.GetKeyDown(KeyCode.RightArrow))
 		{
+			if(_isBackwards)
+				return;
 			_nextDir = 1;
 			if(_curTween == null)
 				onMoveComplete();
 		}
 
-		if(Input.GetKeyUp(KeyCode.UpArrow))
-		{
-			if(_nextDir == 0)
-				_nextDir = -1;
-		}
-		else if(Input.GetKeyUp(KeyCode.RightArrow))
-		{
-			if(_nextDir == 1)
-				_nextDir = -1;
-		}
-		else if(Input.GetKeyUp(KeyCode.DownArrow))
-		{
-			if(_nextDir == 2)
-				_nextDir = -1;
-		}
-		else if(Input.GetKeyUp(KeyCode.LeftArrow))
-		{
-			if(_nextDir == 3)
-				_nextDir = -1;
-		}
+//		if(Input.GetKeyUp(KeyCode.UpArrow))
+//		{
+//			if(_nextDir == 0)
+//				_nextDir = -1;
+//		}
+//		else if(Input.GetKeyUp(KeyCode.RightArrow))
+//		{
+//			if(_nextDir == 1)
+//				_nextDir = -1;
+//		}
+//		else if(Input.GetKeyUp(KeyCode.DownArrow))
+//		{
+//			if(_nextDir == 2)
+//				_nextDir = -1;
+//		}
+//		else if(Input.GetKeyUp(KeyCode.LeftArrow))
+//		{
+//			if(_nextDir == 3)
+//				_nextDir = -1;
+//		}
 	}
 
 	public void init(Transform root, int life)
@@ -117,11 +141,8 @@ public class Hero : MonoBehaviour, ITimerEvent {
 			tailIdx.Clear();
 		}
 
-		Rigidbody2D rid;
-
-
-		tf.GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 1, 0), 0.2f).SetLoops(12, LoopType.Yoyo);
-
+//		tf.GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 1, 0), 0.2f).SetLoops(12, LoopType.Yoyo);
+		headSprRdr.maskInteraction = SpriteMaskInteraction.None;
 	}
 		
 
@@ -160,8 +181,14 @@ public class Hero : MonoBehaviour, ITimerEvent {
 						return;
 					}
 
+					//TODO
+					if(GameController.instance.isEmpty(x, y) == Config.FLAG_EMPTY)
+					{
+						_initDir = _nextDir;
+						tf.rotation = Config.RotationArray[_nextDir];
+					}
 					_curTween = tf.DOLocalMove(new Vector3(tf.localPosition.x+nextDirVal.x*Config.unit, 
-						tf.localPosition.y+nextDirVal.y*Config.unit, 0), 0.1f).SetEase(Ease.Linear).OnComplete(onMoveComplete);
+						tf.localPosition.y+nextDirVal.y*Config.unit, 0), _moveTime).SetEase(Ease.Linear).OnComplete(onMoveComplete);
 					_lastDir = _nextDir;
 					_curPos.x = x;
 					_curPos.y = y;
@@ -169,12 +196,14 @@ public class Hero : MonoBehaviour, ITimerEvent {
 			}
 			else //move from empty to tile
 			{
-				for(int i = 0; i < _tailList.Count; i++)
-				{
-					_pool.Despawn(_tailList[i]);
-				}
-				_tailList.Clear();
+//				for(int i = 0; i < _tailList.Count; i++)
+//				{
+//					_pool.Despawn(_tailList[i]);
+//				}
+//				_tailList.Clear();
+				headSprRdr.sprite = headGetSprs[(_lastDir-_initDir+4)%4];
 				onTouchTile();
+				_nextDir = -1;
 			}
 			break;
 			//continue move
@@ -183,40 +212,82 @@ public class Hero : MonoBehaviour, ITimerEvent {
 			if(_isLastTile)
 			{
 				_map = GameController.instance.getMap();
-				_isLastTile = false;
+
 			}
 			if(_map[_curPos.x, _curPos.y] == Config.FLAG_TAIL)
 			{
 				GameController.instance.dead();
 				break;
 			}
+
 			_map[_curPos.x, _curPos.y] = Config.FLAG_TAIL;
 			tailIdx.Add(new Coord(_curPos.x, _curPos.y));
+
 			tail = _pool.Spawn(pp.prefab);
 			_tailList.Add(tail);
 			tail.SetParent(_root);
 			tail.localPosition = new Vector3(_curPos.x*Config.unit, _curPos.y*Config.unit, 0);
-		
-			if(_nextDir == -1 || Mathf.Abs( _lastDir-_nextDir) == 2)
+			tail.rotation = Config.RotationArray[_lastDir];
+			SpriteRenderer spr = tail.GetComponent<SpriteRenderer>();
+			spr.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+			spr.sortingOrder = 2;
+			if(_nextDir == _lastDir || Mathf.Abs( _lastDir-_nextDir) == 2)
 			{
+				if(_isLastTile)
+					spr.sprite = tailSprs[0];
+				else
+					spr.sprite = bodySprs[0];
 				Coord lastDirVal = Config.directionArray[_lastDir];
 			
 				_curTween = tf.DOLocalMove(new Vector3(tf.localPosition.x+lastDirVal.x*Config.unit, 
-					tf.localPosition.y+lastDirVal.y*Config.unit, 0), 0.1f).SetEase(Ease.Linear).OnComplete(onMoveComplete);
+					tf.localPosition.y+lastDirVal.y*Config.unit, 0), _moveTime).SetEase(Ease.Linear).OnComplete(onMoveComplete);
 				
 				_curPos.x += lastDirVal.x;
 				_curPos.y += lastDirVal.y;
 			}
 			else //change direction
 			{
+				tf.rotation = Config.RotationArray[_nextDir];
+				headSprRdr.sprite = headSprs[(_nextDir-_initDir+4)%4];
+				if(_nextDir-_lastDir == 1)//right
+				{
+					if(_isLastTile)
+						spr.sprite = tailSprs[1];
+					else
+						spr.sprite = bodySprs[1];
+				}
+				else//left
+				{
+					if(_isLastTile)
+						spr.sprite = tailSprs[2];
+					else
+						spr.sprite = bodySprs[2];
+				}
+			
 				_lastDir = _nextDir;
 				Coord nextDirVal = Config.directionArray[_nextDir];
 				_curTween = tf.DOLocalMove(new Vector3(tf.localPosition.x+nextDirVal.x*Config.unit, 
-					tf.localPosition.y+nextDirVal.y*Config.unit, 0), 0.1f).SetEase(Ease.Linear).OnComplete(onMoveComplete);
+					tf.localPosition.y+nextDirVal.y*Config.unit, 0), _moveTime).SetEase(Ease.Linear).OnComplete(onMoveComplete);
 				_curPos.x += nextDirVal.x;
 				_curPos.y += nextDirVal.y;
 			}
+			if(_isLastTile)
+			{
+				headSprRdr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+				_curTween.onUpdate = ()=>{
+					if(_curTween.ElapsedDirectionalPercentage() >= 0.2f)
+					{
+						headSprRdr.maskInteraction = SpriteMaskInteraction.None;
 
+						_curTween.onUpdate = null;
+					}
+				};
+				ani.stop();
+				headSprRdr.sprite = headSprs[0];
+			}
+			else
+				headSprRdr.maskInteraction = SpriteMaskInteraction.None;
+			_isLastTile = false;
 			break;
 			//bite self
 		case Config.FLAG_TAIL:
@@ -225,12 +296,88 @@ public class Hero : MonoBehaviour, ITimerEvent {
 		}
 	}
 
+	int beforeIdx;
+	Transform lastTile;
+	SpriteRenderer lastSpr;
 	private void onTouchTile()
 	{
 		GameController.instance.onTouchTile(tailIdx);
-		tailIdx.Clear();
+		_isBackwards = true;
+		lastTile = _tailList[0];
+		lastSpr = lastTile.GetComponent<SpriteRenderer>();
+		beforeIdx = 1;
+		if(beforeIdx < _tailList.Count)
+		{
+			headMask.SetParent(lastTile);
+			headMask.localScale = new Vector3(0.6f, 0.2f, 1);
+			headMask.localPosition = new Vector3(0, -Config.unit*0.5f, 0);
+			headMask.rotation = lastTile.rotation;
+
+			moveBackward();
+		}
+		else
+			onBackToHeadComplete();
+		
 	}
 
+	private float backWardsTime = 0.2f;
+	private Tweener moveBackTweener;
+	private void moveBackward()
+	{
+		if(beforeIdx >= _tailList.Count)
+		{
+			onBackToHeadComplete();
+			return;
+		}
+
+		Transform before = _tailList[beforeIdx];
+		beforeIdx++;
+		lastSpr.maskInteraction = SpriteMaskInteraction.None;
+		lastSpr.sortingOrder = 1;
+		lastTile.rotation = before.rotation;
+		moveBackTweener = lastTile.DOLocalMove(before.localPosition, backWardsTime).SetEase(Ease.Linear);
+		moveBackTweener.OnUpdate(()=>{
+			if(moveBackTweener.ElapsedDirectionalPercentage() >= 0.8f)
+				{
+					lastSpr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+					moveBackTweener.onUpdate = null;
+				}});
+		moveBackTweener.OnComplete(()=>{
+			before.gameObject.SetActive(false);
+			moveBackward();});
+	}
+
+	private void onBackToHeadComplete()
+	{
+//		headSprRdr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+		lastSpr.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+		headMask.SetParent(tf);
+		headMask.localScale = new Vector3(0.6f, 0.6f, 1);
+		headMask.localPosition =  new Vector3(0, -6, 0);
+		lastTile.rotation = tf.rotation;
+		moveBackTweener = lastTile.DOLocalMove(tf.localPosition, backWardsTime).SetEase(Ease.Linear);
+		moveBackTweener.OnUpdate(()=>{
+			if(moveBackTweener.ElapsedDirectionalPercentage() >= 0.6f)
+			{
+				headSprRdr.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+				moveBackTweener.onUpdate = null;
+			}
+		});
+		moveBackTweener.OnComplete(()=>{ani.play(1, false, onBackwardComplete);});
+	}
+
+	private void onBackwardComplete(GameObject obj)
+	{
+		headSprRdr.maskInteraction = SpriteMaskInteraction.None;
+		for(int i = 0; i < _tailList.Count; i++)
+		{
+			_pool.Despawn(_tailList[i]);
+		}
+		_tailList.Clear();
+		_isBackwards = false;
+
+		tailIdx.Clear();
+	}
 
 	//called by controller not by self.
 	public void dead()

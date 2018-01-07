@@ -80,20 +80,20 @@ public class GameController : MonoBehaviour, ITimerEvent
 
 	public void dead()
 	{
-		if(_startCounting > 0)
-			return;
-		hero.dead();
-		enemy.pause();
-
-		if(_life == 0)
-		{
-			UIController.instance.showFailView();
-		}
-		else
-		{
-			
-			UIController.instance.showContinueView();
-		}
+//		if(_startCounting > 0)
+//			return;
+//		hero.dead();
+//		enemy.pause();
+//
+//		if(_life == 0)
+//		{
+//			UIController.instance.showFailView();
+//		}
+//		else
+//		{
+//			
+//			UIController.instance.showContinueView();
+//		}
 	}
 
 	public void onContinue()

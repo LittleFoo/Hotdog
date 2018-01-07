@@ -11,10 +11,14 @@ public class Config : MonoBehaviour {
 	public const int FLAG_TAIL = 99;
 	public const int FLAG_WALL = -2;
 	public static Coord[] directionArray = {new Coord(0,1), new Coord(1,0), new Coord(0, -1), new Coord(-1,0)};
-	public static Quaternion[] RotationArray = {Quaternion.Euler(new Vector3(0, 0, 180)), 
-		Quaternion.Euler(new Vector3(0, 0, 90)), 
-		Quaternion.Euler(Vector3.zero),
-				Quaternion.Euler(new Vector3(0, 0, 270))};
+//	public static Quaternion[] RotationArray = {Quaternion.Euler(new Vector3(0, 0, 180)), 
+//		Quaternion.Euler(new Vector3(0, 0, 90)), 
+//		Quaternion.Euler(Vector3.zero),
+//				Quaternion.Euler(new Vector3(0, 0, 270))};
+	public static Quaternion[] RotationArray = {Quaternion.Euler(new Vector3(0, 0, 0)),
+		Quaternion.Euler(new Vector3(0, 0, -90)),
+		Quaternion.Euler(new Vector3(0, 0, -180)),
+		Quaternion.Euler(new Vector3(0, 0, -270))};
 	public const string TAG_WALL = "Wall";
 	public const string TAG_TILE = "Tile";
 
