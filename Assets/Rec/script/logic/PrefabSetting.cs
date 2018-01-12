@@ -10,6 +10,7 @@ public class PrefabSetting : MonoBehaviour {
 	public Transform randomDark;
 	public Transform edgeMst;
 	public Transform breaker;
+	public Transform bonus;
 	public void Awake()
 	{
 		GlobalController.instance.prefabSetting = this;

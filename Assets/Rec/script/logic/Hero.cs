@@ -26,6 +26,7 @@ public class Hero : MonoBehaviour, ITimerEvent {
 	private int _nextDir;
 	private int _initDir;
 	private Coord _curPos;
+	public Coord curPos{get{ return _curPos;}}
 	private Tweener _curTween;
 	private List<Transform> _tailList;
 	private bool _isDead = true;
@@ -96,6 +97,8 @@ public class Hero : MonoBehaviour, ITimerEvent {
 				onMoveComplete();
 		}
 
+	
+
 //		if(Input.GetKeyUp(KeyCode.UpArrow))
 //		{
 //			if(_nextDir == 0)
@@ -144,7 +147,17 @@ public class Hero : MonoBehaviour, ITimerEvent {
 //		tf.GetComponent<SpriteRenderer>().DOColor(new Color(1, 1, 1, 0), 0.2f).SetLoops(12, LoopType.Yoyo);
 		headSprRdr.maskInteraction = SpriteMaskInteraction.None;
 	}
-		
+
+	public void changeSpeed(float rate)
+	{
+		_moveTime /= rate;
+	}
+
+	public void resumeSpeed()
+	{
+		_moveTime = 0.3f;
+	}
+
 
 	private void setPos(int x, int y)
 	{
@@ -192,6 +205,7 @@ public class Hero : MonoBehaviour, ITimerEvent {
 					_lastDir = _nextDir;
 					_curPos.x = x;
 					_curPos.y = y;
+					_nextDir = -1;
 				}
 			}
 			else //move from empty to tile
@@ -202,8 +216,8 @@ public class Hero : MonoBehaviour, ITimerEvent {
 //				}
 //				_tailList.Clear();
 				headSprRdr.sprite = headGetSprs[(_lastDir-_initDir+4)%4];
-				onTouchTile();
 				_nextDir = -1;
+				onTouchTile();
 			}
 			break;
 			//continue move
@@ -231,7 +245,7 @@ public class Hero : MonoBehaviour, ITimerEvent {
 			SpriteRenderer spr = tail.GetComponent<SpriteRenderer>();
 			spr.maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
 			spr.sortingOrder = 2;
-			if(_nextDir == _lastDir || Mathf.Abs( _lastDir-_nextDir) == 2)
+			if(_nextDir == _lastDir|| _nextDir == -1 || Mathf.Abs( _lastDir-_nextDir) == 2)
 			{
 				if(_isLastTile)
 					spr.sprite = tailSprs[0];

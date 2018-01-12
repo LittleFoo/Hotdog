@@ -10,9 +10,12 @@ public class GameController : MonoBehaviour, ITimerEvent
 	public Hero hero;
 	public Map map;
 	public EnemyController enemy;
+	public BonusController bonus;
 	private float _startCounting;
 	private int _life;
+	private CsvLevel csvLevel;
 	private static GameController _instance;
+	private CsvLevelUnit _curLevelData;
 	public static GameController instance
 	{
 		get{
@@ -28,8 +31,27 @@ public class GameController : MonoBehaviour, ITimerEvent
 	}
 
 	// Use this for initialization
+
 	void Start()
 	{
+		csvLevel = DataManager.instance.getCsvData<CsvLevel>(CsvConfig.CSV_LEVEL);
+		_curLevelData = csvLevel.getObj(4);
+		if(_curLevelData.bonusIds == null)
+		{
+			_curLevelData.bonusIds = CsvConfig.stringToIntArray<int>(_curLevelData.Bonus);
+			string[] ss = _curLevelData.Monsters.Split("|"[0]);
+			string[] sss;
+			Coord c;
+			_curLevelData.monsterDatas = new List<Coord>();
+			for(int i = 0; i < ss.Length; i++)
+			{
+				sss = ss[i].Split(";"[0]);
+				c = new Coord();
+				c.x = System.Convert.ToInt32(sss[0]);
+				c.y = System.Convert.ToInt32(sss[1]);
+				_curLevelData.monsterDatas.Add(c);
+			}
+		}
 		onGameStart();
 
 	}
@@ -42,9 +64,11 @@ public class GameController : MonoBehaviour, ITimerEvent
 		hero.init(root, _life);
 		map.init();
 		enemy.init(root);
-		enemy.gernerateMst(MstType.randomWalk, 2);
-		enemy.gernerateMst(MstType.darkEdge, 1);
-		enemy.gernerateMst(MstType.breaker, 1);
+		bonus.init(_curLevelData.bonusIds, _curLevelData.BonusNum, Config.width*Config.height);
+		for(int i = 0; i < _curLevelData.monsterDatas.Count; i++)
+		{
+			enemy.gernerateMst((MstType)_curLevelData.monsterDatas[i].x, _curLevelData.monsterDatas[i].y);
+		}
 		TimerManager.instance.addEventListeners(this);
 	}
 
@@ -55,12 +79,13 @@ public class GameController : MonoBehaviour, ITimerEvent
 
 	public void onTouchTile(List<Coord> tails)
 	{
-		map.onTouchTile(tails);
+		bonus.onNewTileBuild(map.onTouchTile(tails));
 		if(enemy.darkCount < map.tilelist.Count/200)
 		{
 			int idx = Random.Range(0, tails.Count-1);
 			enemy.generateDark(map.tilelist[idx]);
 		}
+
 	}
 
 	public int[,] getMap()
@@ -80,7 +105,7 @@ public class GameController : MonoBehaviour, ITimerEvent
 
 	public void dead()
 	{
-//		if(_startCounting > 0)
+//		if(_startCounting > 0 || hero.isBackwards)
 //			return;
 //		hero.dead();
 //		enemy.pause();

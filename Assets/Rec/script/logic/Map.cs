@@ -173,7 +173,7 @@ public class Map : MonoBehaviour {
 		return map;
 	}
 
-	public void makePath(List<Coord> tailList)
+	public int makePath(List<Coord> tailList)
 	{
 		Transform tf;
 
@@ -187,12 +187,13 @@ public class Map : MonoBehaviour {
 			tilelist.Add(new Coord(tailList[i].x, tailList[i].y));
 		}
 		StartCoroutine(generateGeometry());
+		return tailList.Count;
 	}
 
-	public void makeBlock(int[,] map, int flag)
+	public int makeBlock(int[,] map, int flag)
 	{
 		Transform tf;
-
+		int count = 0;
 		int length1 = map.GetLength(0);
 		int length2 = map.GetLength(1);
 		for(int i = 0; i < length1; i++)
@@ -207,17 +208,20 @@ public class Map : MonoBehaviour {
 					tf.localPosition = new Vector3(i*unit, j*unit, 0);
 					_isEmpty[i, j] = Config.FLAG_TILE;
 					tilelist.Add(new Coord(i, j));
+					count++;
 				}
 			}
 		}
 		StartCoroutine(generateGeometry());
+		return count;
 	}
 
-	public void onTouchTile(List<Coord> tailIdx)
+	public int onTouchTile(List<Coord> tailIdx)
 	{
 //		System.Array.Copy(_isEmpty, map, _isEmpty.Length);
 //		for(int i = 0; i < tailIdx.Count; i++)
 //			map[tailIdx[i].x, tailIdx[i].y]=Config.FLAG_TAIL;
+
 		Coord startIdx = null;
 		for(int i = 0; i < tailIdx.Count; i++)
 		{
@@ -247,7 +251,7 @@ public class Map : MonoBehaviour {
 		if(startIdx == null)
 		{
 			makePath(tailIdx);
-			return;
+			return tailIdx.Count;
 		}
 
 		tileCount1 = mark(startIdx, 2);
@@ -279,8 +283,7 @@ public class Map : MonoBehaviour {
 
 		if(startIdx == null)
 		{
-			makePath(tailIdx);
-			return;
+			return makePath(tailIdx);
 		}
 
 		tileCount2 = mark(startIdx, 3);
@@ -289,29 +292,27 @@ public class Map : MonoBehaviour {
 			bool tile1 = GameController.instance.hasMst(2, map);
 			bool tile2 = GameController.instance.hasMst(3, map);
 			if(!tile1)
-				makeBlock(map, 2);
+				return makeBlock(map, 2);
 			else if(!tile2)
-				makeBlock(map, 3);
+				return makeBlock(map, 3);
 			else
-				makePath(tailIdx);
+				return makePath(tailIdx);
 
 		}
 		else if(tileCount1 < tileCount2)
 		{
 			if(GameController.instance.hasMst(2, map))
-				makePath(tailIdx);
+				return makePath(tailIdx);
 			else
-				makeBlock(map, 2);
+				return makeBlock(map, 2);
 		}
 		else
 		{
 			if(GameController.instance.hasMst(3, map))
-				makePath(tailIdx);
+				return makePath(tailIdx);
 			else
-				makeBlock(map, 3);
+				return makeBlock(map, 3);
 			}
-
-
 	}
 
 	private int tileCount1 = 0;

@@ -4,7 +4,7 @@ using UnityEngine;
 using PathologicalGames;
 public class GlobalController : MonoBehaviour {
 	public PrefabSetting prefabSetting;
-//	public Setting setting;
+	public GameSetting setting;
 //	public SceneSetting curScene;
 	private SpawnPool _pool;
 
@@ -34,6 +34,9 @@ public class GlobalController : MonoBehaviour {
 		Application.targetFrameRate = 60;
 
 		UIModule.instance.init();
+		common.DataManager.instance.loadCsvData(common.CsvConfig.CSV_LEVEL, typeof(common.CsvLevel));
+		common.DataManager.instance.loadCsvData(common.CsvConfig.CSV_BONUS, typeof(common.CsvBonus));
+
 //		setting.init();
 	}
 

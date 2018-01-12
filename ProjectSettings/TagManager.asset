@@ -4,16 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - tile
-  - wall
-  - enemy
-  - head
-  - tail
   - Tile
   - Wall
   - Head
   - Tail
   - Enemy
+  - Bonus
   layers:
   - Default
   - TransparentFX

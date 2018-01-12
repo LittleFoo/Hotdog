@@ -114,7 +114,7 @@ namespace common
             _toRemove.Clear();
         }
 
-        public delayCallData delayCall(delayCallData.delayCall func, float time, bool isIgnoreTimeScale = false)
+		public delayCallData delayCall( UnityEngine.Events.UnityAction func, float time, bool isIgnoreTimeScale = false)
         {
 			delayCallData e = new delayCallData(func, time, isIgnoreTimeScale);
             delayCalls.Add(e);
@@ -131,11 +131,10 @@ namespace common
 
     public class delayCallData
     {
-        public delegate void delayCall();
-        public delayCall delayCallFunc;
+		public UnityEngine.Events.UnityAction delayCallFunc;
         public float time;
 		public bool isIgnoreTimeScale;
-        public delayCallData(delayCall func, float delay, bool ignoreTimeScale)
+		public delayCallData( UnityEngine.Events.UnityAction  func, float delay, bool ignoreTimeScale)
         {
             delayCallFunc = func;
             time = delay;

@@ -677,6 +677,7 @@ GameObject:
   - component: {fileID: 659703067}
   - component: {fileID: 659703071}
   - component: {fileID: 659703072}
+  - component: {fileID: 659703073}
   m_Layer: 0
   m_Name: GlobalController
   m_TagString: Untagged
@@ -696,6 +697,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabSetting: {fileID: 0}
+  setting: {fileID: 0}
 --- !u!4 &659703068
 Transform:
   m_ObjectHideFlags: 0
@@ -724,6 +726,7 @@ MonoBehaviour:
   hero: {fileID: 1366671687}
   map: {fileID: 332187220}
   enemy: {fileID: 659703071}
+  bonus: {fileID: 0}
 --- !u!114 &659703070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -741,6 +744,7 @@ MonoBehaviour:
   randomDark: {fileID: 4574681344736556, guid: 19814883eb54d474a906041e222230e3, type: 2}
   edgeMst: {fileID: 4450676639309254, guid: 22ca3d5085e9c48f0a53624702eee6ad, type: 2}
   breaker: {fileID: 4671124418565982, guid: d3f90e1f485384638afb740e2c96e157, type: 2}
+  bonus: {fileID: 0}
 --- !u!114 &659703071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -763,6 +767,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ead25a74064734865bbde5ae6fd98a3e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &659703073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 659703066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aaac3684bc2948f3bc5c77fb400db90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  root: {fileID: 1577196640}
 --- !u!1 &769918564
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,9 +9,21 @@ public class RigidEnemy : EnemyBase {
 	protected Rigidbody2D rigid;
 	protected bool _isVoChanged = false;
 	protected Vector2 _lastVelocity;
+	protected Vector2 _vBeforeBonus;
 	void Awake()
 	{
 		rigid = transform.GetComponent<Rigidbody2D>();
+	}
+
+	public override void changeSpeed(float rate)
+	{
+		_vBeforeBonus = rigid.velocity;
+		rigid.velocity *= rate;
+	}
+
+	public override void resumeSpeed()
+	{
+		rigid.velocity = _vBeforeBonus;
 	}
 
 	public override void pause()
@@ -32,7 +44,6 @@ public class RigidEnemy : EnemyBase {
 
 	void FixedUpdate()
 	{
-
 		if(_isVoChanged)
 		{
 			float y = _speed-rigid.velocity.x*rigid.velocity.x;

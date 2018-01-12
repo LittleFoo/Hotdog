@@ -124,6 +124,13 @@ public class EnemyController : MonoBehaviour {
 		return false;
 	}
 
+	public void onReverse()
+	{
+	}
+
+	public void stopReverse()
+	{
+	}
 
 	public void pause()
 	{
@@ -150,5 +157,15 @@ public class EnemyController : MonoBehaviour {
 			_pool.Despawn(mstList[i]);
 		}
 		mstList.Clear();
+	}
+
+	public void changeSpeed(float rate)
+	{
+		
+	}
+
+	public void resumeSpeed()
+	{
+
 	}
 }

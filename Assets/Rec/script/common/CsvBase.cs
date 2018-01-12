@@ -22,18 +22,17 @@ namespace common
     public class CsvConfig
     {
         public static string CSV_LEVEL = "Data/Level";
-        public static string CSV_PAGE = "Data/Page";
-		public static string CSV_PREFAB = "Data/PrefabList";
-        public List<int> stringToIntArray(string s)
+		public static string CSV_BONUS = "Data/Bonus";
+		public static List<T> stringToIntArray<T>(string s)
         {
             if(s == "")
                 return null;
 
-            string[] ss = s.Split(","[0]);
-            List<int> result = new List<int>(ss.Length);
+			string[] ss = s.Split(";"[0]);
+            List<T> result = new List<T>(ss.Length);
 
             for(int i = 0; i < ss.Length; i++)
-                result.Add(Convert.ToInt32( ss[i]));
+				result.Add((T)Convert.ChangeType( ss[i], typeof(T)));
 
             return result;
         }
@@ -50,10 +49,10 @@ namespace common
     #region CsvLevel
     public class CsvLevel : ICsvBase
     {
-        private Dictionary<string, CsvLevelUnit> units;
+        private Dictionary<int, CsvLevelUnit> units;
         public CsvLevel()
         {
-            units = new Dictionary<string, CsvLevelUnit>();
+			units = new Dictionary<int, CsvLevelUnit>();
         }
         public Type getUnitType()
         {
@@ -61,9 +60,10 @@ namespace common
         }
         public void addObj(String idx, object obj)
         {
-            units.Add(idx, (CsvLevelUnit)obj);
+			CsvLevelUnit unit = (CsvLevelUnit)obj;
+			units.Add(Convert.ToInt32(idx), unit);
         }
-        public CsvLevelUnit getObj(string idx)
+        public CsvLevelUnit getObj(int idx)
         {
             CsvLevelUnit unit;
             units.TryGetValue(idx, out unit);
@@ -75,113 +75,72 @@ namespace common
 
     public class CsvLevelUnit
     {
-//        private int id;
-//        public int ID { get { return id; } set { id = value; } }
-        private int id;
-        public int Id{ get { return id; } set { id = value; } }
-
-        private int bulletType;
-        public int BulletType{ get { return bulletType; } set { bulletType = value; } }
-
-        private string bulletGapRange;
-        public string BulletGapRange{ get { return bulletGapRange; } set { bulletGapRange = value; } }
-
-        private string bulletGapData;
-        public string BulletGapData{ get { return bulletGapData; } set { bulletGapData = value; } }
-
-        private string speedRange;
-        public string SpeedRange{ get { return speedRange; } set { speedRange = value; } }
-        
-        private string speedData;
-        public string SpeedData{ get { return speedData; } set { speedData = value; } }
-
-        private int iceBulletRate;
-        public int IceBulletRate{ get { return iceBulletRate; } set { iceBulletRate = value; } }
-
-        private int limitTime;
-        public int LimitTime{ get { return limitTime; } set { limitTime = value; } }
-
-        private int itemType;
-        public int ItemType{ get { return itemType; } set { itemType = value; } }
-
-        private string itemGapRange;
-        public string ItemGapRange{ get { return itemGapRange; } set { itemGapRange = value; } }
-
-        private string itemGapData;
-        public string ItemGapData{ get { return itemGapData; } set { itemGapData = value; } }
-
-        private int iceStarRange;
-        public int IceStarRange{ get { return iceStarRange; } set { iceStarRange = value; } }
-
-        private float planetGap;
-        public float PlanetGap{ get { return planetGap; } set { planetGap = value; } }
-
-        private int planetDirection;
-        public int PlanetDirection{ get { return planetDirection; } set { planetDirection = value; } }
-
-        private int conditionType;
-        public int ConditionType{ get { return conditionType; } set { conditionType = value; } }
-
-        private string conditionData;
-        public string ConditionData{ get { return conditionData; } set { conditionData = value; } }
-
-		private int failData;
-		public int FailData{ get { return failData; } set { failData = value; } }
-
-        private string talks;
-        public string Talks{ get { return talks; } set { talks = value; } }
-
-        private string preCell;
-        public string PreCell{ get { return preCell; } set { preCell = value; } }
-
-        private int roleLoc;
-        public int RoleLoc{ get { return roleLoc; } set { roleLoc = value; } }
-
-		private string itemPrefab;
-		public string ItemPrefab{ get { return itemPrefab; } set { itemPrefab = value; } }
-
-		private string bulletPrefab;
-		public string BulletPrefab{ get { return bulletPrefab; } set { bulletPrefab = value; } }
+		private int id;
+		public int ID { get { return id; } set { id = value; } }
+		private string monsters;
+		public string Monsters { get { return monsters; } set { monsters = value; } }
+		private string bonus;
+		public string Bonus { get { return bonus; } set { bonus = value; } }
+		private float speedRate;
+		public float SpeedRate { get { return speedRate; } set { speedRate = value; } }
+		private int bonusNum;
+		public int BonusNum { get { return bonusNum; } set { bonusNum = value; } }
+		public  List<int> bonusIds;
+		public List<Coord> monsterDatas;
     }
     #endregion
 
-	#region csvPrefabList
-
-	public class CsvPrefabListUnit
+	#region CsvLevel
+	public class CsvBonus : ICsvBase
 	{
-		//        private int id;
-		//        public int ID { get { return id; } set { id = value; } }
-		private int id;
-		public int Id{ get { return id; } set { id = value; } }
-		
-		private string path;
-		public string Path{ get { return path; } set { path = value; } }
-	}
-
-	public class CsvPrefabList : ICsvBase
-	{
-		private Dictionary<string, CsvPrefabListUnit> units;
-		public CsvPrefabList()
+		private Dictionary<int, List<CsvBonusUnit>> units;
+		public CsvBonus()
 		{
-			units = new Dictionary<string, CsvPrefabListUnit>();
+			units = new Dictionary<int, List<CsvBonusUnit>>();
 		}
 		public Type getUnitType()
 		{
-			return typeof(CsvPrefabListUnit);
+			return typeof(CsvBonusUnit);
 		}
 		public void addObj(String idx, object obj)
 		{
-			units.Add(idx, (CsvPrefabListUnit)obj);
+			int idxNum = Convert.ToInt32(idx);
+			CsvBonusUnit unit = (CsvBonusUnit)obj;
+			List<CsvBonusUnit> unitList;
+			units.TryGetValue(idxNum, out unitList);
+			if(unitList == null)
+			{
+				unitList = new List<CsvBonusUnit>();
+				units.Add(idxNum, unitList);
+			}
+			unitList.Add(unit);
 		}
-		public CsvPrefabListUnit getObj(string idx)
+		public CsvBonusUnit getObj(int idx, int idx2 = 0)
 		{
-			CsvPrefabListUnit unit;
-			units.TryGetValue(idx, out unit);
-			if (unit == null)
-				throw new Exception("CsvPrefabList 不存在 idx = " + idx.ToString());
-			return unit;
+			List< CsvBonusUnit> unitList;
+			units.TryGetValue(idx, out unitList);
+			if (unitList == null || idx2>unitList.Count)
+				throw new Exception("CsvBonus 不存在 idx = " + idx.ToString());
+			return unitList[idx2];
 		}
 	}
 
+	public class CsvBonusUnit
+	{
+		private int id;
+		public int ID { get { return id; } set { id = value; } }
+
+		private string bonusName;
+		public string BonusName { get { return bonusName; } set { bonusName = value; } }
+
+		private int level;
+		public int Level { get { return level; } set { level = value; } }
+
+		private float effect;
+		public float Effect { get { return effect; } set { effect = value; } }
+
+		private float time;
+		public float Time { get { return time; } set { time = value; } }
+	}
 	#endregion
 }

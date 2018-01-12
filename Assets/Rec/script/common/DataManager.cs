@@ -116,9 +116,11 @@ namespace common
             return (T)csvs[idx];
         }
 
-        public void loadCsvData(string fileName, Type t)
+		public void loadCsvData(string fileName, Type t, string idx = "")
         {
-            if (csvs.ContainsKey(fileName))
+			if(idx == "")
+				idx = fileName;
+			if (csvs.ContainsKey(idx))
                 return ;
 
             ICsvBase result = (ICsvBase)Activator.CreateInstance(t);
@@ -156,7 +158,11 @@ namespace common
                     pi = t.GetProperty(title[j]);
                     if (pi == null)
                         continue;
-                    pi.SetValue(data, Convert.ChangeType(unit[j], pi.PropertyType), null);
+					try{ pi.SetValue(data, Convert.ChangeType(unit[j], pi.PropertyType), null);}
+					catch(Exception e)
+					{
+						Debug.Log(e.Message);
+					}
                 }
                 result.addObj(unit[0], data);
             }

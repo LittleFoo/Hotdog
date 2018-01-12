@@ -9,6 +9,8 @@ public class EdgeMst : EnemyBase {
 	private Transform tf;
 	private float halfUnit;
 	private Tweener _curTween;
+	private float _time = 0.2f;
+	private float _curTime;
 	public void init()
 	{
 		tf = transform;
@@ -24,6 +26,7 @@ public class EdgeMst : EnemyBase {
 			else
 				y = Config.height-1;
 		}
+		_curTime = _time;
 		init(new Coord(x, y));
 	}
 
@@ -83,7 +86,7 @@ public class EdgeMst : EnemyBase {
 		}
 
 		_curPos = next;
-		_curTween = tf.DOLocalMove(new Vector3(next.x*Config.unit+halfUnit, next.y*Config.unit+halfUnit), 0.2f).SetEase(Ease.Linear).OnComplete(onMoveComplete);
+		_curTween = tf.DOLocalMove(new Vector3(next.x*Config.unit+halfUnit, next.y*Config.unit+halfUnit),_curTime).SetEase(Ease.Linear).OnComplete(onMoveComplete);
 	}
 
 	//mark tile(0,0)'s top right as (0, 0)
@@ -131,6 +134,15 @@ public class EdgeMst : EnemyBase {
 		return count;
 	}
 
+	public override void changeSpeed(float rate)
+	{
+		_curTime = _time/rate;
+	}
+
+	public override void resumeSpeed()
+	{
+		_curTime = _time;
+	}
 
 	public override void pause()
 	{
